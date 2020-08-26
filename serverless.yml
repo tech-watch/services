@@ -7,4 +7,6 @@ name: aws-lambda-cron-template
 author: Aaron Stuyvenberg
 inputs:
   src: ./src/
-  schedule: cron(0 12 * * ? *)
+  schedule: cron(0 * * * ? *)
+  env:
+    webhookUrl: https://izmaz8n31d.execute-api.us-east-1.amazonaws.com/webhook
