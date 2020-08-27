@@ -24,7 +24,10 @@ const handler = async () => {
         desc: item.description && item.description.replace(/(\r\n|\n|\r)/gm,""),
         urlSource: item.link,
       }),
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `bearer ${process.env.apiKey}`
+      },
     }).then(response => {
       console.log(
         `Response: ${response.status} ${response.statusText}`

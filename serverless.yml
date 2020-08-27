@@ -10,3 +10,6 @@ inputs:
   schedule: cron(0 * * * ? *)
   env:
     webhookUrl: https://izmaz8n31d.execute-api.us-east-1.amazonaws.com/webhook
+
+    # Api key
+    apiKey: ${env:API_KEY}
