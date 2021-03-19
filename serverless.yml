@@ -1,15 +1,17 @@
-org: asudre
-app: tech-watch-cron
-component: aws-lambda-cron
+service: tech-watch
 
-name: aws-lambda-cron-template
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: 'eu-west-1'
+  frameworkVersion: '>=1.43.0'
 
-author: Aaron Stuyvenberg
-inputs:
-  src: ./src/
-  schedule: cron(0 * * * ? *)
-  env:
-    webhookUrl: https://izmaz8n31d.execute-api.us-east-1.amazonaws.com/webhook
+plugins:
+  - serverless-dotenv-plugin
 
-    # Api key
-    apiKey: ${env:API_KEY}
+functions:
+  cron-feed-trello:
+    timeout: 60
+    handler: src/index.handler
+    events:
+      - schedule: rate(${env:RATE_IN_HOURS} hours)

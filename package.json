@@ -1,0 +1,24 @@
+{
+  "name": "services",
+  "description": "Cron to send udpate feeds on trello",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "sls invoke local --function cron-feed-trello",
+    "deploy": "AWS_PROFILE=perso sls deploy --production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tech-watch/services.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tech-watch/services/issues"
+  },
+  "homepage": "https://github.com/tech-watch/services#readme",
+  "devDependencies": {
+    "serverless-dotenv-plugin": "^3.8.2"
+  }
+}
