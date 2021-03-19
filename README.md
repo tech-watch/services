@@ -4,9 +4,8 @@ Configure an AWS profile on your machine named `perso`.
 
 Add a `.env` file with the following environment variables:
 
-- FEEDS_URLS
+- FEEDS_URLS (separated by a comma)
 - RATE_IN_HOURS
-- API_KEY
 - TRELLO_API_KEY
 - TRELLO_API_TOKEN
 - TRELLO_ID_LIST

@@ -3,7 +3,7 @@ service: tech-watch
 provider:
   name: aws
   runtime: nodejs14.x
-  region: 'eu-west-1'
+  region: eu-west-1
 
 plugins:
   - serverless-dotenv-plugin
