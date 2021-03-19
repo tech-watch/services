@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "sls invoke local --function cron-feed-trello",
-    "deploy": "AWS_PROFILE=perso sls deploy --production"
+    "deploy": "AWS_PROFILE=perso sls deploy --stage production"
   },
   "repository": {
     "type": "git",
