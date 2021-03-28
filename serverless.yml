@@ -7,10 +7,80 @@ provider:
 
 plugins:
   - serverless-dotenv-plugin
+  - serverless-pseudo-parameters
 
 functions:
-  cron-feed-trello:
+  cron-feeds:
+    package:
+      individually: true
+      exclude:
+        - './**'
+      include:
+        - ./src/cronFeeds/index.js
+        - ./src/cronFeeds/services/*
+        - ./src/cronFeeds/node_modules/**
+        - ./src/cronFeeds/package.json
     timeout: 60
-    handler: src/index.handler
+    handler: src/cronFeeds/index.handler
+    role: CronFeedsRole
     events:
       - schedule: rate(${env:RATE_IN_HOURS} hours)
+    environment:
+      SQS_SEND_TO_TRELLO_QUEUE_URL: https://sqs.#{AWS::Region}.amazonaws.com/#{AWS::AccountId}/${env:SQS_SEND_TO_TRELLO_QUEUE_NAME}
+
+  send-to-trello:
+    package:
+      individually: true
+      exclude:
+        - './**'
+      include:
+        - ./src/sendToTrello/index.js
+        - ./src/sendToTrello/services/*
+        - ./src/sendToTrello/node_modules/**
+        - ./src/sendToTrello/package.json
+    timeout: 60
+    handler: src/sendToTrello/index.handler
+    events:
+      - sqs: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:${env:SQS_SEND_TO_TRELLO_QUEUE_NAME}
+
+resources:
+  Resources:
+    SendTOTrelloQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${env:SQS_SEND_TO_TRELLO_QUEUE_NAME}
+        VisibilityTimeout: 60
+
+    CronFeedsRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: CronFeedsRole
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: sqlPolicy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource:
+                    - 'Fn::Join':
+                        - ':'
+                        - - 'arn:aws:logs'
+                          - Ref: 'AWS::Region'
+                          - Ref: 'AWS::AccountId'
+                          - 'log-group:/aws/lambda/*:*:*'
+                - Effect: Allow
+                  Action:
+                    - sqs:SendMessage
+                  Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:${env:SQS_SEND_TO_TRELLO_QUEUE_NAME}
