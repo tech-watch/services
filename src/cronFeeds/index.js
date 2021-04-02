@@ -5,7 +5,7 @@ const AWS = require('aws-sdk');
 const { getFeedsOfLastHours } = require('./services/feed');
 
 AWS.config.update({ region: process.env.region });
-const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
+const sns = new AWS.SNS({ apiVersion: '2010-03-31' });
 
 const handler = async () => {
   const { FEEDS_URLS: feedsUrls } = process.env;
@@ -14,16 +14,16 @@ const handler = async () => {
     parseInt(process.env.RATE_IN_HOURS, 10),
   );
 
-  const addToQueue = (feed) => sqs.sendMessage({
-    MessageBody: JSON.stringify({
+  const publish = (feed) => sns.publish({
+    Message: JSON.stringify({
       name: feed.title && feed.title.replace(/(\r\n|\n|\r)/gm, ''),
       desc: feed.description && feed.description.replace(/(\r\n|\n|\r)/gm, ''),
       urlSource: feed.link,
     }),
-    QueueUrl: process.env.SQS_SEND_TO_TRELLO_QUEUE_URL,
+    TopicArn: process.env.TOPIC_ARN,
   }).promise();
 
-  return Promise.all(feeds.map(addToQueue));
+  return Promise.all(feeds.map(publish));
 };
 
 module.exports = {

@@ -10,7 +10,7 @@ plugins:
   - serverless-pseudo-parameters
 
 functions:
-  cron-feeds:
+  cronFeeds:
     package:
       individually: true
       exclude:
@@ -26,9 +26,10 @@ functions:
     events:
       - schedule: rate(${env:RATE_IN_HOURS} hours)
     environment:
-      SQS_SEND_TO_TRELLO_QUEUE_URL: https://sqs.#{AWS::Region}.amazonaws.com/#{AWS::AccountId}/${env:SQS_SEND_TO_TRELLO_QUEUE_NAME}
+      TOPIC_ARN:
+        Ref: SendToTrelloTopic
 
-  send-to-trello:
+  sendToTrello:
     package:
       individually: true
       exclude:
@@ -40,16 +41,32 @@ functions:
         - ./src/sendToTrello/package.json
     timeout: 60
     handler: src/sendToTrello/index.handler
-    events:
-      - sqs: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:${env:SQS_SEND_TO_TRELLO_QUEUE_NAME}
 
 resources:
   Resources:
-    SendTOTrelloQueue:
-      Type: AWS::SQS::Queue
+    SendToTrelloTopic:
+      Type: AWS::SNS::Topic
       Properties:
-        QueueName: ${env:SQS_SEND_TO_TRELLO_QUEUE_NAME}
-        VisibilityTimeout: 60
+        DisplayName: SendToTrello
+        Subscription:
+          - Endpoint:
+              Fn::GetAtt:
+                - SendToTrelloLambdaFunction
+                - Arn
+            Protocol: lambda
+        TopicName: SendToTrello
+
+    LambdaInvokePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        Principal: sns.amazonaws.com
+        SourceArn:
+          Ref: SendToTrelloTopic
+        FunctionName:
+          Fn::GetAtt:
+            - SendToTrelloLambdaFunction
+            - Arn
 
     CronFeedsRole:
       Type: AWS::IAM::Role
@@ -84,3 +101,8 @@ resources:
                   Action:
                     - sqs:SendMessage
                   Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:${env:SQS_SEND_TO_TRELLO_QUEUE_NAME}
+                - Effect: Allow
+                  Action:
+                    - sns:Publish
+                  Resource:
+                    Ref: SendToTrelloTopic
