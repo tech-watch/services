@@ -18,15 +18,17 @@ const createCard = async (list, body) => fetch(`${TRELLO_API_ENDPOINT}/1/cards`,
   }),
   headers: { 'Content-Type': 'application/json' },
 })
-  .then((response) => ({
-    status: response.status,
-    statusText: response.statusText,
-    title: body.name,
-  }))
-  .catch((error) => ({
-    error,
-    title: body.name,
-  }));
+  .then((response) => response.json())
+  .then((response) => {
+    if (response.error) {
+      throw new Error(response.error);
+    }
+    return {
+      status: response.status,
+      statusText: response.statusText,
+      title: body.name,
+    };
+  });
 
 module.exports = {
   createCard,

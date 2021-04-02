@@ -19,6 +19,11 @@
   },
   "homepage": "https://github.com/tech-watch/services#readme",
   "devDependencies": {
-    "serverless-dotenv-plugin": "^3.8.2"
+    "eslint": "^7.7.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "serverless-dotenv-plugin": "^3.8.2",
+    "serverless-pseudo-parameters": "^2.5.0"
   }
 }
