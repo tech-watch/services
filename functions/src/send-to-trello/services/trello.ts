@@ -1,6 +1,7 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-const TRELLO_API_ENDPOINT = 'https://api.trello.com';
+import type { Message, Response } from '../types';
+import config from '../../config';
 
 /**
  * Create a tech hint
@@ -8,11 +9,11 @@ const TRELLO_API_ENDPOINT = 'https://api.trello.com';
  * @param {*} res
  * @param {*} next
  */
-const createCard = async (list, body) => fetch(`${TRELLO_API_ENDPOINT}/1/cards`, {
+export const createCard = async (list: string, body: Message): Promise<Response> => fetch(`${config.TRELLO_API_ENDPOINT}/1/cards`, {
   method: 'POST',
   body: JSON.stringify({
-    key: process.env.TRELLO_API_KEY,
-    token: process.env.TRELLO_API_TOKEN,
+    key: config.TRELLO_API_KEY,
+    token: config.TRELLO_API_TOKEN,
     idList: list,
     ...body,
   }),
@@ -29,7 +30,3 @@ const createCard = async (list, body) => fetch(`${TRELLO_API_ENDPOINT}/1/cards`,
       title: body.name,
     };
   });
-
-module.exports = {
-  createCard,
-};

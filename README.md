@@ -1,23 +1,15 @@
-# Serverless AWS Lambda Cron to send feeds to trello
+# Firebase Cron to send feeds to trello
 
-Configure an AWS profile on your machine named `perso`.
-
-Add a `.env` file with the following environment variables:
-
-- FEEDS_URLS (separated by a comma)
-- RATE_IN_HOURS
-- TRELLO_API_KEY
-- TRELLO_API_TOKEN
-- TRELLO_ID_LIST
-
-## Development
+Add functions config
 
 ```bash
-npm start
+firebase functions:config:set TRELLO_API_KEY=XXX
+firebase functions:config:set TRELLO_API_TOKEN=XXX
+firebase functions:config:set TRELLO_ID_LIST=XXX
 ```
 
 ## Deploy
 
 ```bash
-npm run deploy
+firebase deploy --only functions
 ```
